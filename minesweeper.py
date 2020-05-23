@@ -1,10 +1,12 @@
 import numpy as np
-import os
 import json
+import os
 from pprint import pprint
 
 MINE = -1
 COVER = -2
+
+np.random.seed(0)
 
 
 class Minesweeper():
@@ -12,28 +14,28 @@ class Minesweeper():
     def __init__(self, n=3, m=2):
         self.size = n
         self.mines = m
+        # Largest number tile
         self.maxTile = min(m, 8)
 
-        self.stateEnumeration = {}
-        self.max_states = len(self.stateEnumeration)
-        self.getEnumeration()
-
-        self.covers = []
-        self.board = []
+        # Create game
         self.newGame()
+
+        # Load in state enumeration
+        self.getEnumeration()
+        self.numStates = len(self.stateEnumeration)
+        self.numMoves = n **2
+
+        print('INIT COMPLETE')
 
     def getEnumeration(self):
         n = self.size
         m = self.mines
-        fname = f"{n}n{m}mEnumeration.json"
+        fname = f"data/{n}n{m}mEnumeration.json"
         if os.path.exists(fname):
             self.stateEnumeration = json.load(open(fname))
-            print('LOADED ENUMERATION')
         else:
-            print('BEGINING ENUMERATION')
             self.enumerateStates()
             json.dump(self.stateEnumeration, open(fname, 'w'), indent=4)
-            print('DONE ENUMERATION')
 
     def enumerateStates(self):
         n = self.size
@@ -61,7 +63,9 @@ class Minesweeper():
 
         self.covers = [[1 for _ in range(n)] for _ in range(n)]
         self.board = [[0 for _ in range(n)] for _ in range(n)]
+        self.squaresLeft = (n**2) - m
 
+        # Place mines
         for i in np.random.choice(n**2, m, replace=False):
             self.board[i // n][i % n] = MINE
 
@@ -81,49 +85,77 @@ class Minesweeper():
 
                     self.board[i][j] = count
 
-        print('CREATED NEW GAME')
-
-    def getStateNumber(self):
+    def getState(self):
 
         n = self.size
 
-        observedBoard = self.board[:]
+        strEncodedBoard = ''
         for i in range(n):
             for j in range(n):
                 if self.covers[i][j]:
-                    observedBoard[i][j] = COVER
+                    strEncodedBoard += str(COVER)
+                else:
+                    strEncodedBoard += str(self.board[i][j])
 
-        strEncodedBoard = ''
-        for row in observedBoard:
-            for j in row:
-                strEncodedBoard += str(j)
+        print(strEncodedBoard)
 
         return self.stateEnumeration[strEncodedBoard]
 
-    def move(action):
+    def move(self, action):
+        n = self.size
 
-        # New enumerated state, reward for move, game status
-        return newState, reward, status
+        i, j = action // n, action % n
+
+        # Already uncovered...
+        if self.covers[i][j] == 0:
+            # Small penalty for wasting time
+            reward = -1
+            done = False
+        else:
+            self.covers[i][j] = 0
+
+            if self.board[i][j] == MINE:
+                reward = - (n**3)
+                done = True
+            else:
+                # Small penalty for wasting time
+                reward = -1
+                done = False
+
+                self.squaresLeft -= 1
+                if self.squaresLeft == 0:
+                    reward = (n**3)
+                    done = True
+
+        # New enumerated state, reward for move, game done
+        newState = self.getState()
+        return newState, reward, done
 
     def __str__(self):
         r = ''
 
         n = self.size
 
-        observedBoard = self.board[:]
         for i in range(n):
             for j in range(n):
-                r += f'{self.board[i][j]}'
-                # if self.covers[i][j]:
-                #     r += 'X'
-                # else:
-                #     r += f'{self.board[i][j]}'
+                if self.covers[i][j]:
+                    r += 'X'
+                else:
+                    r += f'{self.board[i][j]} '
             r += '\n'
-
         return r
 
 
 if __name__ == "__main__":
-    m = Minesweeper(3, 2)
-    print(m.getStateNumber())
-    print(m)
+    m = Minesweeper(3, 1)
+    print('# of states:', m.numStates)
+
+    print(m.getState())
+    print(m.move(0))
+    print(m.move(1))
+    print(m.move(2))
+    print(m.move(3))
+    print(m.move(4))
+    print(m.move(5))
+    print(m.move(6))
+    print(m.move(8))
