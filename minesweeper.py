@@ -21,75 +21,11 @@ class Minesweeper():
         self.maxTile = min(m, 8)
 
         # Load in state enumeration
-        self.stateEnumeration = {}
-        self.getEnumeration()
-        self.numStates = len(self.stateEnumeration)
+        self.numStates = (3 + self.maxTile) ** (n ** 2)
         self.numMoves = n ** 2
 
         # Create game
         self.newGame()
-
-    def getEnumeration(self):
-        """ Gets an enumeration of states into memmory, load if cached else create. """
-        n = self.size
-        m = self.mines
-        fname = f"data/{n}n{m}mEnumeration.json"
-
-        if not os.path.exists(fname):
-            self.cacheEnumeration(fname)
-
-        self.stateEnumeration = json.load(open(fname))['enumeration']
-
-    def cacheEnumeration(self, fname, batchsize=1000):
-        """ 
-        DFS to get all possible states.
-
-        There are n^2 cells.
-        Each cell can take on 1 (bomb) + 1 (cover) + 0-8 (number of surrounding bombs) states.
-        => 11^(n^2) states, yikes.
-
-        Can reduce the base by using the number of bombs as the maximum number of surrounding bombs, i.e our tile numbers are in [0, min(m, 8)].
-        => (3 + min(m, 8))^(n^2)
-
-        If DFS can't handle the memmory required for the string encoded boards, then its infeasble to store every string encoded board anyways.
-        """
-        # Create file
-        json.dump({
-            'enumeration': {},
-            'stack': []
-        }, open(fname, 'w'), indent=4)
-
-        n = self.size
-        m = self.mines
-
-        i = 0
-
-        # DFS is cheaper on memmory
-        stack = [('', 0)]
-        batch, b = {}, 0
-        while stack:
-
-            j, length = stack.pop()
-
-            if length == n ** 2:
-
-                batch[j] = i
-
-                # Append batch
-                if b > 100000 or i == (3 + self.maxTile) ** (n ** 2) - 1:
-                    print(f'{int(i / ((3 + self.maxTile) ** (n ** 2)) * 100)} %', j)
-                    data = json.load(open(fname, "r"))
-                    data['enumeration'].update(batch)
-                    data['stack'] = stack
-                    json.dump(data, open(fname, "w"), indent=4)
-
-                    batch, b = {}, 0
-
-                b += 1
-                i += 1
-            else:
-                for k in range(-2, self.maxTile + 1):
-                    stack += [(f'{j}{k}', length + 1)]
 
     def newGame(self):
         """ Starts a new game of minesweeper """
@@ -123,18 +59,34 @@ class Minesweeper():
         return self.getState()
 
     def getState(self):
-        """ Returns the state number for the current state of the gmae"""
+        """
+        Return the state number for the current self.board. We treat board like it is in base 11. This way each board state has a unique state number.
+
+        base 11? 
+        1 (cover) + 1 (bomb) + 0-8 (tile numbers) => each tile has 11 states
+
+        We can try to cut corners on the largest tile number = min(# of bombs, 8)
+
+        base 3 + self.maxTile 
+        1 (cover) + 1 (bomb) + 0-min(# of bombs, 8) (tile numbers) => each tile has 3+maxTile states
+        """
         n = self.size
 
-        strEncodedBoard = ''
-        for i in range(n):
-            for j in range(n):
-                if self.covers[i][j]:
-                    strEncodedBoard += str(COVER)
-                else:
-                    strEncodedBoard += str(self.board[i][j])
+        r = 0
+        base = 3+self.maxTile
 
-        return self.stateEnumeration[strEncodedBoard]
+        for i in range(n**2):
+            # Our state number is the observed state, we need to worry about what is covered
+            # Shift right by two since we have -2 for covered and -1 for bomb => 0-10 digit
+            if self.covers[i // n][i % n] == 1:
+                digit = COVER + 2
+            else:
+                digit = self.board[i // n][i % n] + 2
+
+            r += digit * (base ** i)
+
+        return r
+
 
     def move(self, action):
         """ 
