@@ -16,14 +16,13 @@ class Minesweeper():
         self.maxTile = min(m, 8)
 
         # Load in state enumeration
+        self.stateEnumeration = {}
         self.getEnumeration()
         self.numStates = len(self.stateEnumeration)
         self.numMoves = n ** 2
 
         # Create game
         self.newGame()
-
-        print('INIT COMPLETE')
 
     def getEnumeration(self):
         n = self.size
@@ -48,7 +47,7 @@ class Minesweeper():
             j, length = stack.pop()
 
             if length == n ** 2:
-                # print(i / ((3 + self.maxTile) ** (n ** 2)) * 100, j)
+                print(i / ((3 + self.maxTile) ** (n ** 2)) * 100, j)
                 self.stateEnumeration[j] = i
                 i += 1
             else:
@@ -106,8 +105,8 @@ class Minesweeper():
 
         # Already uncovered...
         if self.covers[i][j] == 0:
-            # Small penalty for wasting time
-            reward = -1
+            # penalty for wasting time
+            reward = -n
             done = False
         else:
             self.covers[i][j] = 0
@@ -116,8 +115,7 @@ class Minesweeper():
                 reward = - (n**3)
                 done = True
             else:
-                # Small penalty for wasting time
-                reward = -1
+                reward = 2
                 done = False
 
                 self.squaresLeft -= 1
