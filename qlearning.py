@@ -7,7 +7,7 @@ np.random.seed(0)
 
 class QLearning():
 
-    def __init__(self, size=3, mines=1, alpha=0.25, gamma=0.3, epsilon=0.15):
+    def __init__(self, size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1):
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
@@ -19,7 +19,7 @@ class QLearning():
         """
         Trains model and returns win percentage over epochs. 
         """
-        
+
         alpha = self.alpha
         gamma = self.gamma
         epsilon = self.epsilon
@@ -53,7 +53,7 @@ class QLearning():
                 state = newState
 
                 if done and reward > 0:
-                        wins += 1
+                    wins += 1
 
         return wins / epochs * 100
 
@@ -95,6 +95,7 @@ class QLearning():
 
         return wins / (trials - instantLoses) * 100
 
+
 def graph():
     xs = [i/100 for i in range(1, 100)]
     training = []
@@ -115,10 +116,11 @@ def graph():
     plt.savefig('graphs/gamma.png')
     plt.show()
 
+
 if __name__ == "__main__":
-    model = QLearning(size=3, mines=2,)
-    trainWP = model.train(100000)
-    testWP = model.test(1000)
+    model = QLearning(size=4, mines=2)
+    trainWP = model.train(10000)
+    testWP = model.test(100)
 
     print(f'Training win percentage: {trainWP}')
     print(f'Testing win percentage: {testWP}')

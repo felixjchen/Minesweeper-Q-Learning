@@ -38,21 +38,27 @@ class Minesweeper():
         if not os.path.exists(fname):
             self.cacheEnumeration(fname)
 
-        self.stateEnumeration = json.load(open(fname))
+        self.stateEnumeration = json.load(open(fname))['enumeration']
 
-    def cacheEnumeration(self, fname):
+    def cacheEnumeration(self, fname, batchsize=1000):
         """ 
         DFS to get all possible states.
 
         There are n^2 cells.
         Each cell can take on 1 (bomb) + 1 (cover) + 0-8 (number of surrounding bombs) states.
         => 11^(n^2) states, yikes.
-        
+
         Can reduce the base by using the number of bombs as the maximum number of surrounding bombs, i.e our tile numbers are in [0, min(m, 8)].
         => (3 + min(m, 8))^(n^2)
 
         If DFS can't handle the memmory required for the string encoded boards, then its infeasble to store every string encoded board anyways.
         """
+        # Create file
+        json.dump({
+            'enumeration': {},
+            'stack': []
+        }, open(fname, 'w'), indent=4)
+
         n = self.size
         m = self.mines
 
@@ -60,13 +66,26 @@ class Minesweeper():
 
         # DFS is cheaper on memmory
         stack = [('', 0)]
+        batch, b = {}, 0
         while stack:
 
             j, length = stack.pop()
 
             if length == n ** 2:
-                print(i / ((3 + self.maxTile) ** (n ** 2)) * 100, j)
-                self.stateEnumeration[j] = i
+
+                batch[j] = i
+
+                # Append batch
+                if b > 100000 or i == (3 + self.maxTile) ** (n ** 2) - 1:
+                    print(f'{int(i / ((3 + self.maxTile) ** (n ** 2)) * 100)} %', j)
+                    data = json.load(open(fname, "r"))
+                    data['enumeration'].update(batch)
+                    data['stack'] = stack
+                    json.dump(data, open(fname, "w"), indent=4)
+
+                    batch, b = {}, 0
+
+                b += 1
                 i += 1
             else:
                 for k in range(-2, self.maxTile + 1):
