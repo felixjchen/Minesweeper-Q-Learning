@@ -1,12 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
 import sys
 
 from minesweeper import Minesweeper
 
 np.random.seed(0)
-
 
 class QLearning():
 
@@ -20,7 +18,7 @@ class QLearning():
 
     def train(self, epochs=1000):
         """
-        Trains model and returns win percentage over epochs. 
+        Trains function and returns win percentage over epochs. 
         """
 
         alpha = self.alpha
@@ -66,7 +64,7 @@ class QLearning():
 
     def test(self, trials=100):
         """
-        Gets win percentage of model over trials. Model repeating action counts as a lose. Model losing on first choice is not counted as lose.
+        Gets win percentage of function over trials. Repeating action counts as a lose. Losing on first choice is not counted as lose.
         """
 
         env = self.env
@@ -114,36 +112,38 @@ def graph():
     testing = []
 
     for x in xs:
-        print(int(x * 100))
-        model = QLearning(size=3, mines=2, gamma=x)
+
+        sys.stdout.write(
+            f'\rDone {x*100}%')
+        sys.stdout.flush()
+
+        model = QLearning(size=4, mines=2, epsilon=x)
         training += [model.train(10000)]
-        testing += [model.test(100)]
+        testing += [model.test(10000)[0]]
 
     plt.plot(xs, training, label="Training")
     plt.plot(xs, testing, label="Testing")
     plt.xlabel('Hyperparameter')
     plt.ylabel('Win Percentage')
-    plt.title('gamma')
+    plt.title('epsilon')
     plt.legend()
-    plt.savefig('graphs/gamma.png')
-    plt.show()
+    plt.savefig('graphs/epsilon.png')
+    # plt.show()
 
 
 if __name__ == "__main__":
+
+    # size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1
+    # size=4, mines=1, alpha=0.3, gamma=0.95, epsilon=0.1
+
     SIZE = 4
     MINES = 2
     ALPHA = 0.2
     GAMMA = 0.9
     EPSILON = 0.1
-
-    # size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1
-    # size=4, mines=1, alpha=0.3, gamma=0.95, epsilon=0.1
     model = QLearning(SIZE, MINES, ALPHA, GAMMA, EPSILON)
-    trainWP = model.train(100000)
+    trainWP = model.train(1000000)
     testWP, penalties = model.test(10000)
-
-    # print(model.q_table.dtype) 
-    # print(model.q_table.nbytes)
 
     print('')
     print(f'Training win percentage: {trainWP}')

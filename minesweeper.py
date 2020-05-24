@@ -15,6 +15,7 @@ class Minesweeper():
         """
         self.size = n
         self.mines = m
+
         # Largest number tile
         self.maxTile = min(m, 8)
         self.numStates = (3 + self.maxTile) ** (n ** 2)
@@ -56,14 +57,14 @@ class Minesweeper():
 
     def getState(self):
         """
-        Return the state number for the current self.board. We treat board like it is in base 11. This way each board state has a unique state number.
+        Return the state number for the current self.board. We treat every cell as it's own digit in base 11. This way each board state has a unique state number.
 
         base 11? 
         1 (cover) + 1 (bomb) + 0-8 (tile numbers) => each tile has 11 states
 
         We can try to cut corners on the largest tile number = min(# of bombs, 8)
 
-        base 3 + self.maxTile 
+        base 3 + self.maxTile?
         1 (cover) + 1 (bomb) + 0-min(# of bombs, 8) (tile numbers) => each tile has 3+maxTile states
         """
         n = self.size
@@ -86,7 +87,7 @@ class Minesweeper():
         """ 
         Takes action and returns new state number, reward and if the game is finished
 
-        action -- uncover board at row action // 2 and col action % 2
+        action -- uncover board at row (action//2) and column (action%2)
         """
         n = self.size
 
