@@ -19,8 +19,6 @@ class Minesweeper():
         self.mines = m
         # Largest number tile
         self.maxTile = min(m, 8)
-
-        # Load in state enumeration
         self.numStates = (3 + self.maxTile) ** (n ** 2)
         self.numMoves = n ** 2
 
@@ -72,9 +70,8 @@ class Minesweeper():
         """
         n = self.size
 
-        r = 0
+        decimal = 0
         base = 3+self.maxTile
-
         for i in range(n**2):
             # Our state number is the observed state, we need to worry about what is covered
             # Shift right by two since we have -2 for covered and -1 for bomb => 0-10 digit
@@ -83,10 +80,9 @@ class Minesweeper():
             else:
                 digit = self.board[i // n][i % n] + 2
 
-            r += digit * (base ** i)
+            decimal += digit * (base ** i)
 
-        return r
-
+        return decimal
 
     def move(self, action):
         """ 
@@ -104,16 +100,19 @@ class Minesweeper():
             reward = -n
             done = False
         else:
+            # Sweep
             self.covers[i][j] = 0
 
+            # Lose
             if self.board[i][j] == MINE:
-                reward = - (n**3)
+                reward = - (n**4)
                 done = True
             else:
-                reward = 2
+                reward = 1
                 done = False
-
                 self.squaresLeft -= 1
+                
+                # Win
                 if self.squaresLeft == 0:
                     reward = (n**3)
                     done = True

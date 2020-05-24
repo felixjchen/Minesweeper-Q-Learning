@@ -30,10 +30,11 @@ class QLearning():
 
         for e in range(epochs):
 
+            print(
+                f'Epoch {round((e+1)/(epochs+1) * 100, 2)}% WR {round(wins / epochs * 100, 2)}%')
+
             state = self.env.newGame()
             done = False
-
-            print(f'Epoch #{e+1/epochs+1}, WR {wins / epochs * 100}')
 
             while not done:
 
@@ -74,7 +75,7 @@ class QLearning():
             state = env.newGame()
             done = False
             moves = 0
-        
+            print('NEWGAME')
             while not done:
                 action = np.argmax(q_table[state])
 
@@ -82,8 +83,9 @@ class QLearning():
 
                 # Repeat action autofail
                 if state == newState:
-                    reward = -1
+                    reward = -999
                     done = True
+
                 # First turn lose
                 if done and moves == 0 and reward < 0:
                     instantLoses += 1
@@ -94,6 +96,8 @@ class QLearning():
 
                 state = newState
                 moves += 1
+
+                print(env)
 
         return wins / (trials - instantLoses) * 100
 
@@ -120,8 +124,9 @@ def graph():
 
 
 if __name__ == "__main__":
-    #size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1
-    model = QLearning(size=4, mines=2)
+    # size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1
+    # size=4, mines=1, alpha=0.3, gamma=0.95, epsilon=0.1
+    model = QLearning(size=4, mines=2, alpha=0.1, gamma=0.95, epsilon=0.1)
     trainWP = model.train(100000)
     testWP = model.test(1000)
 
