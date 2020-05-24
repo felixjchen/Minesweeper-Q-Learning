@@ -1,7 +1,6 @@
 import numpy as np
 import json
 import os
-from pprint import pprint
 
 MINE = -1
 COVER = -2
@@ -10,6 +9,12 @@ COVER = -2
 class Minesweeper():
 
     def __init__(self, n=3, m=2):
+        """
+        An nxn minesweeper board with m mines
+
+        n -- length of side
+        m -- number of mines
+        """
         self.size = n
         self.mines = m
         # Largest number tile
@@ -25,16 +30,29 @@ class Minesweeper():
         self.newGame()
 
     def getEnumeration(self):
+        """ Gets an enumeration of states into memmory, load if cached else create. """
         n = self.size
         m = self.mines
         fname = f"data/{n}n{m}mEnumeration.json"
-        if os.path.exists(fname):
-            self.stateEnumeration = json.load(open(fname))
-        else:
-            self.enumerateStates()
-            json.dump(self.stateEnumeration, open(fname, 'w'), indent=4)
 
-    def enumerateStates(self):
+        if not os.path.exists(fname):
+            self.cacheEnumeration(fname)
+
+        self.stateEnumeration = json.load(open(fname))
+
+    def cacheEnumeration(self, fname):
+        """ 
+        DFS to get all possible states.
+
+        There are n^2 cells.
+        Each cell can take on 1 (bomb) + 1 (cover) + 0-8 (number of surrounding bombs) states.
+        => 11^(n^2) states, yikes.
+        
+        Can reduce the base by using the number of bombs as the maximum number of surrounding bombs, i.e our tile numbers are in [0, min(m, 8)].
+        => (3 + min(m, 8))^(n^2)
+
+        If DFS can't handle the memmory required for the string encoded boards, then its infeasble to store every string encoded board anyways.
+        """
         n = self.size
         m = self.mines
 
@@ -55,6 +73,7 @@ class Minesweeper():
                     stack += [(f'{j}{k}', length + 1)]
 
     def newGame(self):
+        """ Starts a new game of minesweeper """
         n = self.size
         m = self.mines
 
@@ -85,7 +104,7 @@ class Minesweeper():
         return self.getState()
 
     def getState(self):
-
+        """ Returns the state number for the current state of the gmae"""
         n = self.size
 
         strEncodedBoard = ''
@@ -99,6 +118,11 @@ class Minesweeper():
         return self.stateEnumeration[strEncodedBoard]
 
     def move(self, action):
+        """ 
+        Takes action and returns new state number, reward and if the game is finished
+
+        action -- uncover board at row action // 2 and col action % 2
+        """
         n = self.size
 
         i, j = action // n, action % n
@@ -127,6 +151,7 @@ class Minesweeper():
         return self.getState(), reward, done
 
     def __str__(self):
+        """ Returns a str representation of the board """
         r = ''
 
         n = self.size
