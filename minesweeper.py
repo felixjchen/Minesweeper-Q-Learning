@@ -6,8 +6,6 @@ from pprint import pprint
 MINE = -1
 COVER = -2
 
-np.random.seed(0)
-
 
 class Minesweeper():
 
@@ -17,13 +15,13 @@ class Minesweeper():
         # Largest number tile
         self.maxTile = min(m, 8)
 
-        # Create game
-        self.newGame()
-
         # Load in state enumeration
         self.getEnumeration()
         self.numStates = len(self.stateEnumeration)
-        self.numMoves = n **2
+        self.numMoves = n ** 2
+
+        # Create game
+        self.newGame()
 
         print('INIT COMPLETE')
 
@@ -85,6 +83,8 @@ class Minesweeper():
 
                     self.board[i][j] = count
 
+        return self.getState()
+
     def getState(self):
 
         n = self.size
@@ -96,8 +96,6 @@ class Minesweeper():
                     strEncodedBoard += str(COVER)
                 else:
                     strEncodedBoard += str(self.board[i][j])
-
-        print(strEncodedBoard)
 
         return self.stateEnumeration[strEncodedBoard]
 
@@ -128,8 +126,7 @@ class Minesweeper():
                     done = True
 
         # New enumerated state, reward for move, game done
-        newState = self.getState()
-        return newState, reward, done
+        return self.getState(), reward, done
 
     def __str__(self):
         r = ''
@@ -139,9 +136,11 @@ class Minesweeper():
         for i in range(n):
             for j in range(n):
                 if self.covers[i][j]:
-                    r += 'X'
+                    r += 'X  '
                 else:
-                    r += f'{self.board[i][j]} '
+                    t = str(self.board[i][j])
+                    t = t+' ' if len(t) == 2 else t + '  '
+                    r += f'{t}'
             r += '\n'
         return r
 
