@@ -1,5 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
+import sys
+
 from minesweeper import Minesweeper
 
 np.random.seed(0)
@@ -30,8 +33,9 @@ class QLearning():
 
         for e in range(epochs):
 
-            print(
-                f'Epoch {round((e+1)/(epochs+1) * 100, 2)}% WR {round(wins / epochs * 100, 2)}%')
+            sys.stdout.write(
+                f'\rEpoch {round((e+1)/(epochs+1) * 100, 2)}% WR {round(wins / epochs * 100, 2)}%')
+            sys.stdout.flush()
 
             state = self.env.newGame()
             done = False
@@ -75,7 +79,7 @@ class QLearning():
             state = env.newGame()
             done = False
             moves = 0
-            print('NEWGAME')
+            # print('NEWGAME')
             while not done:
                 action = np.argmax(q_table[state])
 
@@ -97,7 +101,7 @@ class QLearning():
                 state = newState
                 moves += 1
 
-                print(env)
+                # print(env)
 
         return wins / (trials - instantLoses) * 100
 
@@ -124,11 +128,20 @@ def graph():
 
 
 if __name__ == "__main__":
+    SIZE = 4
+    MINES = 2
+    ALPHA = 0.2
+    GAMMA = 0.95
+    EPSILON = 0.1
+
     # size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1
     # size=4, mines=1, alpha=0.3, gamma=0.95, epsilon=0.1
-    model = QLearning(size=4, mines=2, alpha=0.1, gamma=0.95, epsilon=0.1)
+    model = QLearning(SIZE, MINES, ALPHA, GAMMA, EPSILON)
     trainWP = model.train(100000)
     testWP = model.test(1000)
 
+    # print(np.mean(model.q_table, axis=1))
+
+    print('')
     print(f'Training win percentage: {trainWP}')
     print(f'Testing win percentage: {testWP}')

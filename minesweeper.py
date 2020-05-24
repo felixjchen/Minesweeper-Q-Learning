@@ -1,10 +1,7 @@
 import numpy as np
-import json
-import os
 
 MINE = -1
 COVER = -2
-
 
 class Minesweeper():
 
@@ -97,7 +94,7 @@ class Minesweeper():
         # Already uncovered...
         if self.covers[i][j] == 0:
             # penalty for wasting time
-            reward = -n
+            reward = - n ** 2
             done = False
         else:
             # Sweep
@@ -105,16 +102,16 @@ class Minesweeper():
 
             # Lose
             if self.board[i][j] == MINE:
-                reward = - (n**4)
+                reward = - n ** 4
                 done = True
             else:
-                reward = 1
+                reward = n  
                 done = False
                 self.squaresLeft -= 1
-                
+
                 # Win
                 if self.squaresLeft == 0:
-                    reward = (n**3)
+                    reward = n ** 3
                     done = True
 
         # New enumerated state, reward for move, game done
