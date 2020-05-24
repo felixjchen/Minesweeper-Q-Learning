@@ -3,6 +3,7 @@ import numpy as np
 MINE = -1
 COVER = -2
 
+
 class Minesweeper():
 
     def __init__(self, n=3, m=2):
@@ -105,7 +106,7 @@ class Minesweeper():
                 reward = - n ** 4
                 done = True
             else:
-                reward = n  
+                reward = n
                 done = False
                 self.squaresLeft -= 1
 
