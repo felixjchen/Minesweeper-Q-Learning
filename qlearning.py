@@ -6,6 +6,7 @@ from minesweeper import Minesweeper
 
 np.random.seed(0)
 
+
 class QLearning():
 
     def __init__(self, size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1):
@@ -59,7 +60,7 @@ class QLearning():
 
                 if done and reward > 0:
                     wins += 1
-        
+
         print('')
         return wins / epochs * 100
 
@@ -102,8 +103,7 @@ class QLearning():
                 moves += 1
                 state = newState
 
-
-        return wins / (trials - instantLoses) * 100, penalties 
+        return wins / (trials - instantLoses) * 100, penalties
 
     def demo(self):
         env = self.env
@@ -128,7 +128,6 @@ class QLearning():
                 print('WIN')
             elif done:
                 print('LOSE')
-
 
 
 def graph():
@@ -169,7 +168,7 @@ if __name__ == "__main__":
     trainWP = model.train(100000)
     testWP, penalties = model.test(10000)
     model.demo()
-
+    model.demo()
 
     print('')
     print(f'Training win percentage: {trainWP}')
