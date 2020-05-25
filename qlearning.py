@@ -59,7 +59,8 @@ class QLearning():
 
                 if done and reward > 0:
                     wins += 1
-
+        
+        print('')
         return wins / epochs * 100
 
     def test(self, trials=100):
@@ -78,7 +79,6 @@ class QLearning():
             state = env.newGame()
             done = False
             moves = 0
-            # print('NEWGAME')
             while not done:
                 action = np.argmax(q_table[state])
 
@@ -98,12 +98,37 @@ class QLearning():
                 if done and reward > 0:
                     wins += 1
 
-                state = newState
-                moves += 1
-
                 # print(env)
+                moves += 1
+                state = newState
+
 
         return wins / (trials - instantLoses) * 100, penalties 
+
+    def demo(self):
+        env = self.env
+        q_table = self.q_table
+
+        state = env.newGame()
+        done = False
+        while not done:
+            action = np.argmax(q_table[state])
+
+            newState, reward, done = env.move(action)
+
+            # Repeat action autofail
+            if state == newState:
+                reward = -999
+                done = True
+
+            state = newState
+
+            print(env)
+            if done and reward > 0:
+                print('WIN')
+            elif done:
+                print('LOSE')
+
 
 
 def graph():
@@ -132,19 +157,20 @@ def graph():
 
 
 if __name__ == "__main__":
-    graph()
     # size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1
     # size=4, mines=1, alpha=0.3, gamma=0.95, epsilon=0.1
 
-    # SIZE = 4
-    # MINES = 2
-    # ALPHA = 0.2
-    # GAMMA = 0.9
-    # EPSILON = 0.1
-    # model = QLearning(SIZE, MINES, ALPHA, GAMMA, EPSILON)
-    # trainWP = model.train(1000000)
-    # testWP, penalties = model.test(10000)
+    SIZE = 4
+    MINES = 2
+    ALPHA = 0.2
+    GAMMA = 0.9
+    EPSILON = 0.1
+    model = QLearning(SIZE, MINES, ALPHA, GAMMA, EPSILON)
+    trainWP = model.train(100000)
+    testWP, penalties = model.test(10000)
+    model.demo()
 
-    # print('')
-    # print(f'Training win percentage: {trainWP}')
-    # print(f'Testing win percentage: {testWP} with {penalties} penalties')
+
+    print('')
+    print(f'Training win percentage: {trainWP}')
+    print(f'Testing win percentage: {testWP} with {penalties} penalties')
