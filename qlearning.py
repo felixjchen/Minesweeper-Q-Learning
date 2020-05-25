@@ -118,7 +118,7 @@ def graph():
         sys.stdout.flush()
 
         model = QLearning(size=4, mines=2, epsilon=x)
-        training += [model.train(10000)]
+        training += [model.train(1000000)]
         testing += [model.test(10000)[0]]
 
     plt.plot(xs, training, label="Training")
@@ -132,19 +132,19 @@ def graph():
 
 
 if __name__ == "__main__":
-
+    graph()
     # size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1
     # size=4, mines=1, alpha=0.3, gamma=0.95, epsilon=0.1
 
-    SIZE = 4
-    MINES = 2
-    ALPHA = 0.2
-    GAMMA = 0.9
-    EPSILON = 0.1
-    model = QLearning(SIZE, MINES, ALPHA, GAMMA, EPSILON)
-    trainWP = model.train(1000000)
-    testWP, penalties = model.test(10000)
+    # SIZE = 4
+    # MINES = 2
+    # ALPHA = 0.2
+    # GAMMA = 0.9
+    # EPSILON = 0.1
+    # model = QLearning(SIZE, MINES, ALPHA, GAMMA, EPSILON)
+    # trainWP = model.train(1000000)
+    # testWP, penalties = model.test(10000)
 
-    print('')
-    print(f'Training win percentage: {trainWP}')
-    print(f'Testing win percentage: {testWP} with {penalties} penalties')
+    # print('')
+    # print(f'Training win percentage: {trainWP}')
+    # print(f'Testing win percentage: {testWP} with {penalties} penalties')
