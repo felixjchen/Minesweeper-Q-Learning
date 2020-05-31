@@ -9,12 +9,12 @@ np.random.seed(0)
 
 class QLearning():
 
-    def __init__(self, size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1):
+    def __init__(self, size, mines, reward_profile, alpha=0.05, gamma=0.9, epsilon=0.1):
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
 
-        self.env = Minesweeper(size, mines)
+        self.env = Minesweeper(size, mines, reward_profile)
         self.q_table = np.zeros((self.env.numStates, self.env.numMoves))
 
     def train(self, epochs=1000):
@@ -49,7 +49,7 @@ class QLearning():
                 newState, reward, done = env.move(action)
 
                 oldReward = q_table[state, action]
-                nextMax = np.argmax(q_table[newState])
+                nextMax = np.max(q_table[newState])
 
                 # UPDATE
                 q_table[state, action] = (1-alpha)*oldReward + \
@@ -61,7 +61,6 @@ class QLearning():
                 if done and reward > 0:
                     wins += 1
 
-        print('')
         return wins / epochs * 100
 
     def test(self, trials=100):
@@ -131,7 +130,7 @@ class QLearning():
 
 
 def graph():
-    xs = [i/100 for i in range(1, 100)]
+    xs = [i/1000 for i in range(1, 1000)]
     training = []
     testing = []
 
@@ -141,35 +140,44 @@ def graph():
             f'\rDone {x*100}%')
         sys.stdout.flush()
 
-        model = QLearning(size=4, mines=2, epsilon=x)
-        training += [model.train(1000000)]
+        reward_profile = {
+            'sweep': 1,
+            'resweep': -2,
+            'win': 4 ** 2,
+            'lose': -4 ** 2
+        }
+
+        model = QLearning(4, 2, reward_profile, gamma=x)
+        training += [model.train(30000)]
         testing += [model.test(10000)[0]]
 
     plt.plot(xs, training, label="Training")
     plt.plot(xs, testing, label="Testing")
     plt.xlabel('Hyperparameter')
     plt.ylabel('Win Percentage')
-    plt.title('epsilon')
+    plt.title('gamma')
     plt.legend()
-    plt.savefig('graphs/epsilon.png')
+    plt.savefig('graphs/gamma.png')
     # plt.show()
 
 
 if __name__ == "__main__":
-    # size=3, mines=2, alpha=0.05, gamma=0.9, epsilon=0.1
-    # size=4, mines=1, alpha=0.3, gamma=0.95, epsilon=0.1
+    graph()
+    # SIZE = 4
+    # MINES = 2
+    # ALPHA = 0.1
+    # GAMMA = 0.9
+    # EPSILON = 0.1
+    # reward_profile = {
+    #     'sweep': 1,
+    #     'resweep': -2,
+    #     'win': SIZE ** 2,
+    #     'lose': -SIZE ** 2
+    # }
+    # model = QLearning(SIZE, MINES, reward_profile, ALPHA, GAMMA, EPSILON)
+    # trainWP = model.train(150000)
+    # testWP, penalties = model.test(10000)
 
-    SIZE = 4
-    MINES = 2
-    ALPHA = 0.2
-    GAMMA = 0.9
-    EPSILON = 0.1
-    model = QLearning(SIZE, MINES, ALPHA, GAMMA, EPSILON)
-    trainWP = model.train(100000)
-    testWP, penalties = model.test(10000)
-    model.demo()
-    model.demo()
-
-    print('')
-    print(f'Training win percentage: {trainWP}')
-    print(f'Testing win percentage: {testWP} with {penalties} penalties')
+    # print('')
+    # print(f'Training win percentage: {trainWP}')
+    # print(f'Testing win percentage: {testWP} with {penalties} penalties')

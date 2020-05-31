@@ -6,7 +6,7 @@ COVER = -2
 
 class Minesweeper():
 
-    def __init__(self, n=3, m=2):
+    def __init__(self, n, m, reward_profile):
         """
         An nxn minesweeper board with m mines
 
@@ -15,6 +15,7 @@ class Minesweeper():
         """
         self.size = n
         self.mines = m
+        self.reward_profile = reward_profile
 
         # Largest number tile
         self.maxTile = min(m, 8)
@@ -90,13 +91,14 @@ class Minesweeper():
         action -- uncover board at row (action//2) and column (action%2)
         """
         n = self.size
+        reward_profile = self.reward_profile
 
         i, j = action // n, action % n
 
         # Already uncovered...
         if self.covers[i][j] == 0:
             # penalty for wasting time
-            reward = - n ** 2
+            reward = reward_profile['resweep']
             done = False
         else:
             # Sweep
@@ -104,16 +106,16 @@ class Minesweeper():
 
             # Lose
             if self.board[i][j] == MINE:
-                reward = - n ** 4
+                reward = reward_profile['lose']
                 done = True
             else:
-                reward = n
+                reward = reward_profile['sweep']
                 done = False
                 self.squaresLeft -= 1
 
                 # Win
                 if self.squaresLeft == 0:
-                    reward = n ** 3
+                    reward = reward_profile['win']
                     done = True
 
         # New enumerated state, reward for move, game done
@@ -138,7 +140,15 @@ class Minesweeper():
 
 
 if __name__ == "__main__":
-    m = Minesweeper(3, 1)
+    n = 3
+    m = 1
+    reward_profile = {
+        'sweep': 1,
+        'resweep': -2,
+        'win': n ** 2,
+        'lose': -n ** 2
+    }
+    m = Minesweeper(3, 1, reward_profile)
     print('# of states:', m.numStates)
 
     print(m.getState())
