@@ -162,22 +162,22 @@ def graph():
 
 
 if __name__ == "__main__":
-    graph()
-    # SIZE = 4
-    # MINES = 2
-    # ALPHA = 0.1
-    # GAMMA = 0.9
-    # EPSILON = 0.1
-    # reward_profile = {
-    #     'sweep': 1,
-    #     'resweep': -2,
-    #     'win': SIZE ** 2,
-    #     'lose': -SIZE ** 2
-    # }
-    # model = QLearning(SIZE, MINES, reward_profile, ALPHA, GAMMA, EPSILON)
-    # trainWP = model.train(150000)
-    # testWP, penalties = model.test(10000)
+    # graph()
+    SIZE = 4
+    MINES = 2
+    ALPHA = 0.05
+    GAMMA = 0.95
+    EPSILON = 0.1
+    reward_profile = {
+        'sweep': 1,
+        'resweep': -2,
+        'win': SIZE ** 2,
+        'lose': -SIZE ** 2
+    }
+    model = QLearning(SIZE, MINES, reward_profile, ALPHA, GAMMA, EPSILON)
+    trainWP = model.train(150000)
+    testWP, penalties = model.test(10000)
 
-    # print('')
-    # print(f'Training win percentage: {trainWP}')
-    # print(f'Testing win percentage: {testWP} with {penalties} penalties')
+    print('')
+    print(f'Training win percentage: {trainWP}')
+    print(f'Testing win percentage: {testWP} with {penalties} penalties')
