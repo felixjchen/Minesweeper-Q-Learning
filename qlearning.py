@@ -177,6 +177,7 @@ if __name__ == "__main__":
     model = QLearning(SIZE, MINES, reward_profile, ALPHA, GAMMA, EPSILON)
     trainWP = model.train(150000)
     testWP, penalties = model.test(10000)
+    model.demo()
 
     print('')
     print(f'Training win percentage: {trainWP}')
