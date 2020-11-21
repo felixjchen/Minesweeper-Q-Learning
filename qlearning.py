@@ -169,10 +169,10 @@ if __name__ == "__main__":
     GAMMA = 0.95
     EPSILON = 0.1
     reward_profile = {
-        'sweep': 1,
-        'resweep': -2,
-        'win': SIZE ** 2,
-        'lose': -SIZE ** 2
+        'sweep': 0,
+        'resweep': -1,
+        'win': 1,
+        'lose': -1 
     }
     model = QLearning(SIZE, MINES, reward_profile, ALPHA, GAMMA, EPSILON)
     trainWP = model.train(150000)
